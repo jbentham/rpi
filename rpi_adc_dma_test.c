@@ -29,7 +29,7 @@
 #include <ctype.h>
 #include "rpi_dma_utils.h"
 
-#define VERSION "0.03"
+#define VERSION "0.04"
 
 #define MCP3008                 // ADC to use: MCP3008 or ADS7884
 #define SAMPLE_RATE     10000   // Default sample rate (samples/sec)
