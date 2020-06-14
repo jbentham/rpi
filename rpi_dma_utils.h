@@ -164,8 +164,6 @@ typedef struct {
 #define CLK_PWM_CTL     0xa0
 #define CLK_PWM_DIV     0xa4
 #define CLK_PASSWD      0x5a000000
-//#define CLOCK_HZ        250000000
-#define CLOCK_HZ        400000000
 #define PWM_CLOCK_ID    0xa
 
 void fail(char *s);
