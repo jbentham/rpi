@@ -16,13 +16,13 @@
 //
 
 // Location of peripheral registers in physical memory
-#define PHYS_REG_BASE   PI_23_REG_BASE
+#define PHYS_REG_BASE   PI_01_REG_BASE
 #define PI_01_REG_BASE  0x20000000  // Pi Zero or 1
 #define PI_23_REG_BASE  0x3F000000  // Pi 2 or 3
 #define PI_4_REG_BASE   0xFE000000  // Pi 4
 
-#define CLOCK_HZ      250000000   // Pi 2 - 4
-//#define CLOCK_HZ        400000000   // Pi Zero
+//#define CLOCK_HZ      250000000   // Pi 2 - 4
+#define CLOCK_HZ        400000000   // Pi Zero
 
 // Location of peripheral registers in bus memory
 #define BUS_REG_BASE    0x7E000000
@@ -70,10 +70,12 @@ typedef struct {
 #define GPIO_IN         0
 #define GPIO_OUT        1
 #define GPIO_ALT0       4
+#define GPIO_ALT1       5
 #define GPIO_ALT2       6
 #define GPIO_ALT3       7
 #define GPIO_ALT4       3
 #define GPIO_ALT5       2
+#define GPIO_MODE_STRS  "IN","OUT","ALT5","ALT4","ALT0","ALT1","ALT2","ALT3"
 #define GPIO_NOPULL     0
 #define GPIO_PULLDN     1
 #define GPIO_PULLUP     2
@@ -157,7 +159,7 @@ typedef struct {
 #define PWM_CTL_USEF1   (1<<5)  // Chan 1: use FIFO
 #define PWM_DMAC_ENAB   (1<<31) // Start PWM DMA
 #define PWM_ENAB        1       // Enable PWM
-#define PWM_PIN         18      // GPIO pin for PWM output
+#define PWM_PIN         12      // GPIO pin for PWM output, 12 or 18
 
 // Clock registers and values
 #define CLK_BASE        (PHYS_REG_BASE + 0x101000)
@@ -175,6 +177,7 @@ void gpio_pull(int pin, int pull);
 void gpio_mode(int pin, int mode);
 void gpio_out(int pin, int val);
 uint8_t gpio_in(int pin);
+void disp_mode_vals(uint32_t mode);
 int open_mbox(void);
 void close_mbox(int fd);
 uint32_t msg_mbox(int fd, VC_MSG *msgp);
@@ -189,6 +192,7 @@ void disp_vc_msg(VC_MSG *msgp);
 void enable_dma(int chan);
 void start_dma(MEM_MAP *mp, int chan, DMA_CB *cbp, uint32_t csval);
 uint32_t dma_transfer_len(int chan);
+uint32_t dma_active(int chan);
 void stop_dma(int chan);
 void disp_dma(int chan);
 void init_pwm(int freq, int range, int val);

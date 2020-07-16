@@ -33,6 +33,7 @@
 
 char *dma_regstrs[] = {"DMA CS", "CB_AD", "TI", "SRCE_AD", "DEST_AD",
     "TFR_LEN", "STRIDE", "NEXT_CB", "DEBUG", ""};
+char *gpio_mode_strs[] = {GPIO_MODE_STRS};
 
 // Virtual memory pointers to acceess GPIO, DMA and PWM from user space
 MEM_MAP pwm_regs, gpio_regs, dma_regs, clk_regs;
@@ -42,7 +43,7 @@ void *map_periph(MEM_MAP *mp, void *phys, int size)
 {
     mp->phys = phys;
     mp->size = PAGE_ROUNDUP(size);
-    mp->bus = phys - PHYS_REG_BASE + BUS_REG_BASE;
+    mp->bus = (void *)((uint32_t)phys - PHYS_REG_BASE + BUS_REG_BASE);
     mp->virt = map_segment(phys, mp->size);
     return(mp->virt);
 }
@@ -118,6 +119,16 @@ uint8_t gpio_in(int pin)
 {
     volatile uint32_t *reg = REG32(gpio_regs, GPIO_LEV0) + pin/32;
     return (((*reg) >> (pin % 32)) & 1);
+}
+
+// Display the values in a GPIO mode register
+void disp_mode_vals(uint32_t mode)
+{
+    int i;
+
+    for (i=0; i<10; i++)
+        printf("%u:%-4s ", i, gpio_mode_strs[(mode>>(i*3)) & 7]);
+    printf("\n");
 }
 
 // ----- VIDEOCORE MAILBOX -----
@@ -260,6 +271,12 @@ uint32_t dma_transfer_len(int chan)
     return(*REG32(dma_regs, DMA_REG(chan, DMA_TXFR_LEN)));
 }
 
+// Check if DMA is active
+uint32_t dma_active(int chan)
+{
+    return((*REG32(dma_regs, DMA_REG(chan, DMA_CS))) & 1);
+}
+
 // Halt current DMA operation by resetting controller
 void stop_dma(int chan)
 {
@@ -306,7 +323,7 @@ void init_pwm(int freq, int range, int val)
     *REG32(pwm_regs, PWM_RNG1) = range;
     *REG32(pwm_regs, PWM_FIF1) = val;
 #if PWM_OUT
-    gpio_mode(PWM_PIN, GPIO_ALT5);
+    gpio_mode(PWM_PIN, PWM_PIN==12 ? GPIO_ALT0 : GPIO_ALT5);
 #endif
 }
 
