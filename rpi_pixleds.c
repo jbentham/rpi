@@ -29,6 +29,7 @@
 // v0.10 JPB 28/9/20 Corrected Pi Zero caching problem
 // v0.11 JPB 29/9/20 Added enable_dma before transfer (in case still active)
 //                   Corrected DMA nsamp value (was byte count)
+// v0.12 JPB 26/5/21 Corrected transfer length for 16-bit mode
 
 #include <stdio.h>
 #include <signal.h>
@@ -371,7 +372,7 @@ void setup_smi_dma(MEM_MAP *mp, int nsamp)
     smi_cs->write = 1;
     enable_dma(DMA_CHAN);
     cbs[0].ti = DMA_DEST_DREQ | (DMA_SMI_DREQ << 16) | DMA_CB_SRCE_INC | DMA_WAIT_RESP;
-    cbs[0].tfr_len = nsamp;
+    cbs[0].tfr_len = nsamp * sizeof(TXDATA_T);
     cbs[0].srce_ad = MEM_BUS_ADDR(mp, txdata);
     cbs[0].dest_ad = REG_BUS_ADDR(smi_regs, SMI_D);
 }
