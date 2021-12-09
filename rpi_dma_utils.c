@@ -94,7 +94,7 @@ void gpio_pull(int pin, int pull)
 
     *REG32(gpio_regs, GPIO_GPPUD) = pull;
     usleep(2);
-    *reg = pin << (pin % 32);
+    *reg = 1 << (pin % 32);
     usleep(2);
     *REG32(gpio_regs, GPIO_GPPUD) = 0;
     *reg = 0;
