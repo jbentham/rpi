@@ -368,7 +368,11 @@ void setup_smi_dma(MEM_MAP *mp, int nsamp)
     smi_cs->enable = 1;
     smi_cs->clear = 1;
     smi_cs->pxldat = 1;
+#if LED_NCHANS > 8
+    smi_l->len = nsamp * sizeof(TXDATA_T) * 2;
+#else
     smi_l->len = nsamp * sizeof(TXDATA_T);
+#endif
     smi_cs->write = 1;
     enable_dma(DMA_CHAN);
     cbs[0].ti = DMA_DEST_DREQ | (DMA_SMI_DREQ << 16) | DMA_CB_SRCE_INC | DMA_WAIT_RESP;
