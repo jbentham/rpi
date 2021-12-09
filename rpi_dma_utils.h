@@ -16,7 +16,7 @@
 //
 
 // Location of peripheral registers in physical memory
-#define PHYS_REG_BASE   PI_01_REG_BASE
+#define PHYS_REG_BASE   PI_23_REG_BASE
 #define PI_01_REG_BASE  0x20000000  // Pi Zero or 1
 #define PI_23_REG_BASE  0x3F000000  // Pi 2 or 3
 #define PI_4_REG_BASE   0xFE000000  // Pi 4
@@ -93,7 +93,7 @@ typedef enum {
     MEM_FLAG_L1_NONALLOCATING=(MEM_FLAG_DIRECT | MEM_FLAG_COHERENT) // Allocating in L2
 } VC_ALLOC_FLAGS;
 // VC flags for unchached DMA memory
-#define DMA_MEM_FLAGS (MEM_FLAG_DIRECT|MEM_FLAG_ZERO)
+#define DMA_MEM_FLAGS (VC_ALLOC_FLAGS)(MEM_FLAG_DIRECT|MEM_FLAG_ZERO)
 
 // Mailbox command/response structure
 typedef struct {
@@ -168,7 +168,7 @@ typedef struct {
 #define CLK_PASSWD      0x5a000000
 #define PWM_CLOCK_ID    0xa
 
-void fail(char *s);
+void fail(const char *s);
 void *map_periph(MEM_MAP *mp, void *phys, int size);
 void *map_uncached_mem(MEM_MAP *mp, int size);
 void unmap_periph_mem(MEM_MAP *mp);

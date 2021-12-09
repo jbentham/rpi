@@ -74,7 +74,7 @@
 #define REQUEST_THRESH  4
 
 // SMI register names for diagnostic print
-char *smi_regstrs[] = {
+const char *smi_regstrs[] = {
     "CS","LEN","A","D","DSR0","DSW0","DSR1","DSW1",
     "DSR2","DSW2","DSR3","DSW3","DMC","DCS","DCA","DCD",""
 };
@@ -82,11 +82,11 @@ char *smi_regstrs[] = {
 // SMI CS register field names for diagnostic print
 #define STRS(x)     STRS_(x) ","
 #define STRS_(...)  #__VA_ARGS__
-char *smi_cs_regstrs = STRS(SMI_CS_FIELDS);
+const char *smi_cs_regstrs = STRS(SMI_CS_FIELDS);
 
 // Structures for mapped I/O devices, and non-volatile memory
-extern MEM_MAP gpio_regs, dma_regs;
-MEM_MAP vc_mem, clk_regs, smi_regs;
+extern MEM_MAP gpio_regs, dma_regs, clk_regs;
+MEM_MAP vc_mem, smi_regs;
 
 // Pointers to SMI registers
 volatile SMI_CS_REG  *smi_cs;
@@ -107,7 +107,7 @@ uint16_t sample_data[NSAMPLES];
 #define VC_MEM_SIZE(nsamp) (PAGE_SIZE + ((nsamp)+4)*SAMPLE_SIZE)
 
 void map_devices(void);
-void fail(char *s);
+void fail(const char *s);
 void terminate(int sig);
 void smi_start(int nsamples, int packed);
 uint32_t *adc_dma_start(MEM_MAP *mp, int nsamp);
@@ -117,7 +117,7 @@ void disp_smi(void);
 void mode_word(uint32_t *wp, int n, uint32_t mode);
 float val_volts(int val);
 int adc_gpio_val(void);
-void disp_reg_fields(char *regstrs, char *name, uint32_t val);
+void disp_reg_fields(const char *regstrs, const char *name, uint32_t val);
 void dma_wait(int chan);
 
 int main(int argc, char *argv[])
@@ -174,7 +174,7 @@ void map_devices(void)
 }
 
 // Catastrophic failure in initial setup
-void fail(char *s)
+void fail(const char *s)
 {
     printf(s);
     terminate(0);
@@ -214,7 +214,7 @@ void smi_start(int nsamples, int packed)
 // Start DMA for SMI ADC, return Rx data buffer
 uint32_t *adc_dma_start(MEM_MAP *mp, int nsamp)
 {
-    DMA_CB *cbs=mp->virt;
+    DMA_CB *cbs = (DMA_CB *)(mp->virt);
     uint32_t *data=(uint32_t *)(cbs+4), *pindata=data+8, *modes=data+0x10;
     uint32_t *modep1=data+0x18, *modep2=modep1+1, *rxdata=data+0x20, i;
 
@@ -359,9 +359,9 @@ int adc_gpio_val(void)
 }
 
 // Display bit values in register
-void disp_reg_fields(char *regstrs, char *name, uint32_t val)
+void disp_reg_fields(const char *regstrs, const char *name, uint32_t val)
 {
-    char *p=regstrs, *q, *r=regstrs;
+    const char *p=regstrs, *q, *r=regstrs;
     uint32_t nbits, v;
 
     printf("%s %08X", name, val);

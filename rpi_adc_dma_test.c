@@ -74,7 +74,7 @@
 #define SPI_AUTO_CS     (1 << 11)
 
 // SPI register strings
-char *spi_regstrs[] = {"CS", "FIFO", "CLK", "DLEN", "LTOH", "DC", ""};
+const char *spi_regstrs[] = {"CS", "FIFO", "CLK", "DLEN", "LTOH", "DC", ""};
 
 // Buffer for processed ADC samples
 uint16_t *sample_buff;
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        if (!(sample_buff = malloc((sample_count+4) * 2)))
+        if (!(sample_buff = (uint16_t*)malloc((sample_count+4) * 2)))
             fail("Can't allocate sample buffer\n");
         printf("%u samples at %u S/s\n", sample_count, f/(RX_SAMPLE_SIZE*8));
         n = adc_dma_samples(&vc_mem, ADC_CHAN, sample_buff, sample_count);
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 }
 
 // Catastrophic failure in initial setup
-void fail(char *s)
+void fail(const char *s)
 {
     printf(s);
     terminate(0);
@@ -209,7 +209,7 @@ int adc_sample(int chan)
 // Fetch single sample from MCP3008 ADC using DMA
 int adc_dma_sample_mcp3008(MEM_MAP *mp, int chan)
 {
-    DMA_CB *cbs=mp->virt;
+    DMA_CB *cbs = (DMA_CB *)(mp->virt);
     uint32_t dlen, *txd=(uint32_t *)(cbs+2);
     uint8_t *rxdata=(uint8_t *)(txd+0x10);
 
@@ -265,7 +265,7 @@ int adc_dma_samples(MEM_MAP *mp, int chan, uint16_t *buff, int nsamp)
 // Fetch samples from MCP3008 ADC using DMA
 int adc_dma_samples_mcp3008(MEM_MAP *mp, int chan, uint16_t *buff, int nsamp)
 {
-    DMA_CB *cbs=mp->virt;
+    DMA_CB *cbs = (DMA_CB *)(mp->virt);
     uint32_t i, dlen, *txd=(uint32_t *)(cbs+4), *pindata=(uint32_t *)(txd+0x10);
     uint8_t *rxdata=(uint8_t *)(txd+0x20);
 
@@ -324,7 +324,7 @@ int adc_dma_samples_mcp3008(MEM_MAP *mp, int chan, uint16_t *buff, int nsamp)
 // Fetch samples from ADS7884 ADC using DMA
 int adc_dma_samples_ads7884(MEM_MAP *mp, int chan, uint16_t *buff, int nsamp)
 {
-    DMA_CB *cbs=mp->virt;
+    DMA_CB *cbs = (DMA_CB *)(mp->virt);
     uint32_t i, dlen, shift, *txd=(uint32_t *)(cbs+3);
     uint8_t *rxdata=(uint8_t *)(txd+0x10);
 
@@ -392,7 +392,7 @@ int mcp3008_tx_data(void *buff, int chan)
 #if ADC_9_BITS
     uint8_t txd[2]={0xc0|(chan<<3), 0x00};
 #else
-    uint8_t txd[3]={0x01, 0x80|(chan<<4), 0x00};
+    uint8_t txd[3]={0x01, (uint8_t)(0x80|(chan<<4)), 0x00};
 #endif
     memcpy(buff, txd, sizeof(txd));
     return(sizeof(txd));
@@ -401,7 +401,7 @@ int mcp3008_tx_data(void *buff, int chan)
 // Return value from ADC Rx data
 int mcp3008_rx_value(void *buff)
 {
-    uint8_t *rxd=buff;
+    uint8_t *rxd = (uint8_t *)buff;
 #if ADC_9_BITS
     return((((int)rxd[0] << 9) | ((int)rxd[1] << 1)) & 0x3ff);
 #else

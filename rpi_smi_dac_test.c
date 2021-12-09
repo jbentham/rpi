@@ -67,7 +67,7 @@
 
 #define DMA_SMI_DREQ 4
 
-char *smi_regstrs[] = {
+const char *smi_regstrs[] = {
     "CS","LEN","A","D","DSR0","DSW0","DSR1","DSW1",
     "DSR2","DSW2","DSR3","DSW3","DMC","DCS","DCA","DCD",""
 };
@@ -112,13 +112,13 @@ REG_DEF(SMI_DCD_REG, SMI_DCD_FIELDS);
     fcnt:6, _x1:2, flvl:6
 REG_DEF(SMI_FLVL_REG, SMI_FLVL_FIELDS);
 
-char *smi_cs_regstrs = STRS(SMI_CS_FIELDS);
+const char *smi_cs_regstrs = STRS(SMI_CS_FIELDS);
 
 #define CLK_SMI_CTL     0xb0
 #define CLK_SMI_DIV     0xb4
 
-extern MEM_MAP gpio_regs, dma_regs;
-MEM_MAP vc_mem, clk_regs, smi_regs;
+extern MEM_MAP gpio_regs, dma_regs, clk_regs;
+MEM_MAP vc_mem, smi_regs;
 
 volatile SMI_CS_REG  *smi_cs;
 volatile SMI_L_REG   *smi_l;
@@ -140,11 +140,11 @@ void dac_ladder_init(void);
 void dac_ladder_write(int val);
 void dac_ladder_dma(MEM_MAP *mp, uint8_t *data, int len, int repeat);
 void map_devices(void);
-void fail(char *s);
+void fail(const char *s);
 void terminate(int sig);
 void init_smi(int width, int ns, int setup, int hold, int strobe);
 void disp_smi(void);
-void disp_reg_fields(char *regstrs, char *name, uint32_t val);
+void disp_reg_fields(const char *regstrs, const char *name, uint32_t val);
 void dma_wait(int chan);
 
 int main(int argc, char *argv[])
@@ -216,7 +216,7 @@ void dac_ladder_write(int val)
 // DMA values to resistor DAC
 void dac_ladder_dma(MEM_MAP *mp, uint8_t *data, int len, int repeat)
 {
-    DMA_CB *cbs=mp->virt;
+    DMA_CB *cbs = (DMA_CB *)(mp->virt);
     uint8_t *txdata=(uint8_t *)(cbs+1);
     
     memcpy(txdata, data, len);
@@ -241,7 +241,7 @@ void map_devices(void)
 }
 
 // Catastrophic failure in initial setup
-void fail(char *s)
+void fail(const char *s)
 {
     printf(s);
     terminate(0);
@@ -322,9 +322,9 @@ void disp_smi(void)
 }
 
 // Display bit values in register
-void disp_reg_fields(char *regstrs, char *name, uint32_t val)
+void disp_reg_fields(const char *regstrs, const char *name, uint32_t val)
 {
-    char *p=regstrs, *q, *r=regstrs;
+    const char *p=regstrs, *q, *r=regstrs;
     uint32_t nbits, v;
     
     printf("%s %08X", name, val);

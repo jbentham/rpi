@@ -31,9 +31,9 @@
 // If non-zero, enable PWM hardware output
 #define PWM_OUT         0
 
-char *dma_regstrs[] = {"DMA CS", "CB_AD", "TI", "SRCE_AD", "DEST_AD",
+const char *dma_regstrs[] = {"DMA CS", "CB_AD", "TI", "SRCE_AD", "DEST_AD",
     "TFR_LEN", "STRIDE", "NEXT_CB", "DEBUG", ""};
-char *gpio_mode_strs[] = {GPIO_MODE_STRS};
+const char *gpio_mode_strs[] = {GPIO_MODE_STRS};
 
 // Virtual memory pointers to acceess GPIO, DMA and PWM from user space
 MEM_MAP pwm_regs, gpio_regs, dma_regs, clk_regs;
@@ -182,25 +182,25 @@ uint32_t alloc_vc_mem(int fd, uint32_t size, VC_ALLOC_FLAGS flags)
 // Lock allocated memory, return bus address
 void *lock_vc_mem(int fd, int h)
 {
-    VC_MSG msg={.tag=0x3000d, .blen=4, .dlen=4, .uints={h}};
+    VC_MSG msg={.tag=0x3000d, .blen=4, .dlen=4, .uints={(uint32_t)h}};
     return(h ? (void *)msg_mbox(fd, &msg) : 0);
 }
 // Unlock allocated memory
 uint32_t unlock_vc_mem(int fd, int h)
 {
-    VC_MSG msg={.tag=0x3000e, .blen=4, .dlen=4, .uints={h}};
+    VC_MSG msg={.tag=0x3000e, .blen=4, .dlen=4, .uints={(uint32_t)h}};
     return(h ? msg_mbox(fd, &msg) : 0);
 }
 // Free memory
 uint32_t free_vc_mem(int fd, int h)
 {
-    VC_MSG msg={.tag=0x3000f, .blen=4, .dlen=4, .uints={h}};
+    VC_MSG msg={.tag=0x3000f, .blen=4, .dlen=4, .uints={(uint32_t)h}};
     return(h ? msg_mbox(fd, &msg) : 0);
 }
 uint32_t set_vc_clock(int fd, int id, uint32_t freq)
 {
-    VC_MSG msg1={.tag=0x38001, .blen=8, .dlen=8, .uints={id, 1}};
-    VC_MSG msg2={.tag=0x38002, .blen=12, .dlen=12, .uints={id, freq, 0}};
+    VC_MSG msg1={.tag=0x38001, .blen=8, .dlen=8, .uints={(uint32_t)id, 1}};
+    VC_MSG msg2={.tag=0x38002, .blen=12, .dlen=12, .uints={(uint32_t)id, freq, 0}};
     msg_mbox(fd, &msg1);
     disp_vc_msg(&msg1);
     msg_mbox(fd, &msg2);
