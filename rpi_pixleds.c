@@ -70,8 +70,8 @@
 #endif
 
 // Structures for mapped I/O devices, and non-volatile memory
-extern MEM_MAP gpio_regs, dma_regs;
-MEM_MAP vc_mem, clk_regs, smi_regs;
+extern MEM_MAP gpio_regs, dma_regs, clk_regs;
+MEM_MAP vc_mem, smi_regs;
 
 // Pointers to SMI registers
 volatile SMI_CS_REG  *smi_cs;
