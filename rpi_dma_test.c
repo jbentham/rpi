@@ -29,14 +29,14 @@
 
 // Location of peripheral registers in physical memory
 //#define PHYS_REG_BASE  0x20000000  // Pi Zero or 1
-#define PHYS_REG_BASE    0x3F000000  // Pi 2 or 3
-//#define PHYS_REG_BASE  0xFE000000  // Pi 4
+// #define PHYS_REG_BASE    0x3F000000  // Pi 2 or 3
+#define PHYS_REG_BASE  0xFE000000  // Pi 4
 
 // Location of peripheral registers in bus memory
 #define BUS_REG_BASE    0x7E000000
 
 // If non-zero, print debug information
-#define DEBUG           0
+#define DEBUG           1
 
 // Output pin to use for LED
 //#define LED_PIN         47    // Pi Zero onboard LED
@@ -80,7 +80,7 @@ int mbox_fd, dma_mem_h;
 void *bus_dma_mem;
 
 // Convert memory bus address to physical address (for mmap)
-#define BUS_PHYS_ADDR(a) ((void *)((uint32_t)(a)&~0xC0000000))
+#define BUS_PHYS_ADDR(a) ((void *)((uintptr_t)(a) & ~((uintptr_t)0xC0000000)))
 
 // Videocore mailbox memory allocation flags, see:
 //     https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
@@ -121,7 +121,7 @@ typedef struct {
 #define DMA_NEXTCONBK   (DMA_CHAN*0x100 + 0x1c)
 #define DMA_DEBUG       (DMA_CHAN*0x100 + 0x20)
 #define DMA_ENABLE      0xff0
-#define VIRT_DMA_REG(a) ((volatile uint32_t *)((uint32_t)virt_dma_regs + a))
+#define VIRT_DMA_REG(a) ((volatile uint32_t *)((uintptr_t)virt_dma_regs + a))
 char *dma_regstrs[] = {"DMA CS", "CB_AD", "TI", "SRCE_AD", "DEST_AD",
     "TFR_LEN", "STRIDE", "NEXT_CB", "DEBUG", ""};
 
@@ -143,7 +143,7 @@ typedef struct {
 void *virt_dma_mem;
 
 // Convert virtual DMA data address to a bus address
-#define BUS_DMA_MEM(a)  ((uint32_t)a-(uint32_t)virt_dma_mem+(uint32_t)bus_dma_mem)
+#define BUS_DMA_MEM(a) ((uintptr_t)(a) - (uintptr_t)virt_dma_mem + (uintptr_t)bus_dma_mem)
 
 // PWM controller
 #define PWM_BASE        (PHYS_REG_BASE + 0x20C000)
