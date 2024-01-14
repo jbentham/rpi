@@ -133,6 +133,15 @@ void disp_mode_vals(uint32_t mode)
 
 // ----- VIDEOCORE MAILBOX -----
 
+
+// Free memory segments and exit
+
+// Catastrophic failure in initial setup
+void fail(char *s)
+{
+    printf(s);
+}
+
 // Open mailbox interface, return file descriptor
 int open_mbox(void)
 {
