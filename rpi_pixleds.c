@@ -55,7 +55,6 @@
 #define LED_POSTBITS    4   // Number of zero bits after LED data
 #define BIT_NPULSES     3   // Number of O/P pulses per LED bit
 #define CHAN_MAXLEDS    600 // Maximum number of LEDs per channel
-#define CHASE_MSEC      10  // Delay time for chaser light test
 #define REQUEST_THRESH  2   // DMA request threshold
 #define DMA_CHAN        10  // DMA channel to use
 
@@ -110,6 +109,7 @@ TXDATA_T tx_buffer[TX_BUFF_LEN(CHAN_MAXLEDS)];  // Tx buffer for assembling data
 int testmode, chan_ledcount=1;          // Command-line parameters
 int rgb_data[CHAN_MAXLEDS][LED_NCHANS]; // RGB data
 int chan_num;                           // Current channel for data I/P
+float chase_msec = 16.6666666666666;    // Delay time for chaser light test
 
 void rgb_txdata(int *rgbs, TXDATA_T *txd);
 int str_rgb(char *s, int rgbs[][LED_NCHANS], int chan);
@@ -141,11 +141,19 @@ int main(int argc, char *argv[])
             case 'T':                   // -T: test mode
                 testmode = 1;
                 break;
+            case 'M':                   // -M: delay for chaser light test
+                if (args >= argc-1)
+                    fprintf(stderr, "Error: no numeric value\n");
+                else
+                    chase_msec = atof(argv[++args]);
+                break;
+                break;
             default:                    // Otherwise error
                 printf("Unrecognised option '%c'\n", argv[args][1]);
                 printf("Options:\n"
                        "  -n num    number of LEDs per channel\n"\
                        "  -t        Test mode (flash LEDs)\n"\
+                       "  -m float  Delay for test mode (in ms)\n"\
                       );
                 return(1);
             }
@@ -196,7 +204,7 @@ int main(int argc, char *argv[])
 #endif
             memcpy(txdata, tx_buffer, TX_BUFF_SIZE(chan_ledcount));
             start_smi(&vc_mem);
-            usleep(CHASE_MSEC * 1000);
+            usleep((int)(chase_msec * 1000));
         }
     }
     else
