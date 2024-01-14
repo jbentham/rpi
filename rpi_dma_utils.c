@@ -43,7 +43,7 @@ void *map_periph(MEM_MAP *mp, void *phys, int size)
 {
     mp->phys = phys;
     mp->size = PAGE_ROUNDUP(size);
-    mp->bus = (void *)((uint32_t)phys - PHYS_REG_BASE + BUS_REG_BASE);
+    mp->bus = (void *)((POINTER_TYPE)phys - PHYS_REG_BASE + BUS_REG_BASE);
     mp->virt = map_segment(phys, mp->size);
     return(mp->virt);
 }
@@ -183,7 +183,7 @@ uint32_t alloc_vc_mem(int fd, uint32_t size, VC_ALLOC_FLAGS flags)
 void *lock_vc_mem(int fd, int h)
 {
     VC_MSG msg={.tag=0x3000d, .blen=4, .dlen=4, .uints={h}};
-    return(h ? (void *)msg_mbox(fd, &msg) : 0);
+    return(h ? (void *)(POINTER_TYPE)msg_mbox(fd, &msg) : 0);
 }
 // Unlock allocated memory
 uint32_t unlock_vc_mem(int fd, int h)
@@ -231,7 +231,7 @@ void *map_segment(void *addr, int size)
     size = PAGE_ROUNDUP(size);
     if ((fd = open ("/dev/mem", O_RDWR|O_SYNC|O_CLOEXEC)) < 0)
         fail("Error: can't open /dev/mem, run using sudo\n");
-    mem = mmap(0, size, PROT_WRITE|PROT_READ, MAP_SHARED, fd, (uint32_t)addr);
+    mem = mmap(0, size, PROT_WRITE|PROT_READ, MAP_SHARED, fd, (POINTER_TYPE)addr);
     close(fd);
 #if DEBUG
     printf("Map %p -> %p\n", (void *)addr, mem);

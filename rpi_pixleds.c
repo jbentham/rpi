@@ -54,8 +54,8 @@
 #define LED_PREBITS     4   // Number of zero bits before LED data
 #define LED_POSTBITS    4   // Number of zero bits after LED data
 #define BIT_NPULSES     3   // Number of O/P pulses per LED bit
-#define CHAN_MAXLEDS    50  // Maximum number of LEDs per channel
-#define CHASE_MSEC      100 // Delay time for chaser light test
+#define CHAN_MAXLEDS    600 // Maximum number of LEDs per channel
+#define CHASE_MSEC      10  // Delay time for chaser light test
 #define REQUEST_THRESH  2   // DMA request threshold
 #define DMA_CHAN        10  // DMA channel to use
 
