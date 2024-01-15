@@ -16,13 +16,16 @@
 //
 
 // Location of peripheral registers in physical memory
-#define PHYS_REG_BASE   PI_01_REG_BASE
+#define PHYS_REG_BASE   PI_4_REG_BASE
 #define PI_01_REG_BASE  0x20000000  // Pi Zero or 1
 #define PI_23_REG_BASE  0x3F000000  // Pi 2 or 3
 #define PI_4_REG_BASE   0xFE000000  // Pi 4
 
-//#define CLOCK_HZ      250000000   // Pi 2 - 4
-#define CLOCK_HZ        400000000   // Pi Zero
+//#define CLOCK_HZ      400000000   // Pi Zero
+#define CLOCK_HZ        250000000   // Pi 2 - 4
+
+//#define POINTER_TYPE  uint32_t    // 32-bit
+#define POINTER_TYPE    size_t	    // 64-bit
 
 // Location of peripheral registers in bus memory
 #define BUS_REG_BASE    0x7E000000
@@ -49,14 +52,14 @@ typedef struct {
 } MEM_MAP;
 
 // Get virtual 8 and 32-bit pointers to register
-#define REG8(m, x)  ((volatile uint8_t *) ((uint32_t)(m.virt)+(uint32_t)(x)))
-#define REG32(m, x) ((volatile uint32_t *)((uint32_t)(m.virt)+(uint32_t)(x)))
+#define REG8(m, x)  ((volatile uint8_t *) ((POINTER_TYPE)(m.virt)+(POINTER_TYPE)(x)))
+#define REG32(m, x) ((volatile uint32_t *)((POINTER_TYPE)(m.virt)+(POINTER_TYPE)(x)))
 // Get bus address of register
-#define REG_BUS_ADDR(m, x)  ((uint32_t)(m.bus)  + (uint32_t)(x))
+#define REG_BUS_ADDR(m, x)  ((POINTER_TYPE)(m.bus)  + (POINTER_TYPE)(x))
 // Convert uncached memory virtual address to bus address
-#define MEM_BUS_ADDR(mp, a) ((uint32_t)a-(uint32_t)mp->virt+(uint32_t)mp->bus)
+#define MEM_BUS_ADDR(mp, a) ((POINTER_TYPE)a-(POINTER_TYPE)mp->virt+(POINTER_TYPE)mp->bus)
 // Convert bus address to physical address (for mmap)
-#define BUS_PHYS_ADDR(a)    ((void *)((uint32_t)(a)&~0xC0000000))
+#define BUS_PHYS_ADDR(a)    ((void *)((POINTER_TYPE)(a)&~0xC0000000))
 
 // GPIO register definitions
 #define GPIO_BASE       (PHYS_REG_BASE + 0x200000)
